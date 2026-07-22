@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: eureka
+
+server:
+  port: ${EUREKA_PORT}
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: ${EUREKA_URL}
+  instance:
+    hostname: ${APP_EUREKA_HOSTNAME}
+    prefer-ip-address: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info, prometheus
+  endpoint:
+    health:
+      show-details: always
