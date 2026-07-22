@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: gateway-sv
+  cloud:
+    gateway:
+      routes:
+        - id: portal-bancario-rota
+          uri: lb://PORTAL-BANCARIO-SV
+          predicates:
+            - Path=/portal-bancario-sv/**
+          filters:
+            - StripPrefix=1
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+  #security:
+   # oauth2:
+    #  resourceserver:
+     #   opaquetoken:
+          # URL padrão de introspecção do Keycloak (substitua 'seu-realm' pelo nome do seu Realm)
+          #introspection-uri: http://remessa-keycloak:8080/realms/remessa/protocol/openid-connect/token/introspect
+          #client-id: ${KEYCLOAK_CLIENT_ID}
+         # client-secret: ${KEYCLOAK_CLIENT_SECRET}
+
+server:
+  port: ${GATEWAY_PORT}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    hostname: ${APP_GATEWAY_HOSTNAME}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
