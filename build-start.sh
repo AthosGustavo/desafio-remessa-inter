@@ -40,7 +40,7 @@ done
 
 cd ..
 
-docker compose --env-file $CAMINHO_ENV up --build -d
+docker compose --env-file $CAMINHO_ENV up --build
 
 
 echo -e "Container iniciado"
