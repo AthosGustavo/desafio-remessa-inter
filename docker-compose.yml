@@ -43,7 +43,7 @@ services:
       dockerfile: ../../infra/docker/jre/Dockerfile
     container_name: remessa-portal-bancario
     ports:
-      - ${PORTAL_BANCARIO_PORT}:${PORTAL_BANCARIO_PORT}
+      - "${PORTAL_BANCARIO_PORT}:${PORTAL_BANCARIO_PORT}"
     environment:
       APP_PORTAL_BANCARIO_HOSTNAME: ${APP_PORTAL_BANCARIO_HOSTNAME}
       EUREKA_URL: ${EUREKA_URL}
@@ -52,15 +52,26 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       PORTAL_BANCARIO_PORT: ${PORTAL_BANCARIO_PORT}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORTAL_BANCARIO_PORT}/actuator/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORTAL_BANCARIO_PORT}/actuator/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     networks:
       - remessa
     restart: unless-stopped
     depends_on:
+      postgresql:
+        condition: service_healthy
+        restart: true
       eureka:
-        condition: service_healthy 
-      rabbitmq: 
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   integracao-monetaria:
@@ -111,6 +122,27 @@ services:
     networks:
       - remessa
     restart: unless-stopped
+
+  postgresql:
+    image: postgres:16-alpine
+    container_name: remessa-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - remessa
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 
   grafana:
@@ -184,7 +216,7 @@ volumes:
     driver: local
   promtail_data:
     driver: local
-  keycloak_data:
+  postgres_data:
     driver: local
 
   
