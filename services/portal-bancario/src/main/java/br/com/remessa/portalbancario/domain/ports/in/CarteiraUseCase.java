@@ -9,6 +9,5 @@ import java.math.BigDecimal;
 
 public interface CarteiraUseCase {
     BigDecimal consultarSaldoPorMoeda(String documento, String senha, EnumMoeda moeda);
-    Carteira depositar(String documento,String senha,EnumMoeda moedaOrigem,BigDecimal valorMoedaOrigem, EnumMoeda moedaDestino);
     ConsultarSaldoTotalResponse consultarSaldoTotal(String documento, String senha);
 }
