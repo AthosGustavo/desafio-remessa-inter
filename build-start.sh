@@ -16,6 +16,7 @@ services=(
     "gateway"
     "portal-bancario"
     "integracao-monetaria"
+    "transferencia-bancaria"
 )
 
 

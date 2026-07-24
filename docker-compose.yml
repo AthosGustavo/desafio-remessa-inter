@@ -74,6 +74,43 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  transferencia-bancaria:
+    build:
+      context: services/transferencia-bancaria
+      dockerfile: ../../infra/docker/jre/Dockerfile
+    container_name: remessa-transferencia-bancaria
+    ports:
+      - "${TRANSFERENCIA_BANCARIA_PORT}:${TRANSFERENCIA_BANCARIA_PORT}"
+    environment:
+      APP_TRANSFERENCIA_BANCARIA_HOSTNAME: ${APP_TRANSFERENCIA_BANCARIA_HOSTNAME}
+      EUREKA_URL: ${EUREKA_URL}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_NODE_PORT: ${RABBITMQ_NODE_PORT}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      TRANSFERENCIA_BANCARIA_PORT: ${TRANSFERENCIA_BANCARIA_PORT}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL_TRANSFERENCIA_BANCARIA}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER_TRANSFERENCIA_BANCARIA}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD_TRANSFERENCIA_BANCARIA}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${TRANSFERENCIA_BANCARIA_PORT}/actuator/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - remessa
+    restart: unless-stopped
+    depends_on:
+      postgresql-transferencia-bancaria:
+        condition: service_healthy
+        restart: true
+      eureka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
   integracao-monetaria:
     build:
       context: services/integracao-monetaria
@@ -130,10 +167,32 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - remessa
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  postgresql-transferencia-bancaria:
+    image: postgres:16-alpine
+    container_name: remessa-postgres-transferencia-bancaria
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_TRANSFERENCIA_BANCARIA}
+      POSTGRES_USER: ${POSTGRES_USER_TRANSFERENCIA_BANCARIA}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_TRANSFERENCIA_BANCARIA}
+    ports:
+      - "${POSTGRES_PORT_TRANSFERENCIA_BANCARIA}:5432"
+    volumes:
+      - postgres_transferencia_data:/var/lib/postgresql/data
     networks:
       - remessa
     restart: unless-stopped
@@ -217,6 +276,8 @@ volumes:
   promtail_data:
     driver: local
   postgres_data:
+    driver: local
+  postgres_transferencia_data:
     driver: local
 
   
