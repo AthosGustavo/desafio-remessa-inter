@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: transferencia-bancaria-sv
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/transferencia-bancaria}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_NODE_PORT}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+
+server:
+  port: ${TRANSFERENCIA_BANCARIA_PORT}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    hostname: ${APP_TRANSFERENCIA_BANCARIA_HOSTNAME}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
