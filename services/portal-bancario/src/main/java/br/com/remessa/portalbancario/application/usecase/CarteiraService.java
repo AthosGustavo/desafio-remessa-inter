@@ -25,13 +25,7 @@ public class CarteiraService implements CarteiraUseCase {
         return carteira.obterSaldoPorMoeda(moeda);
     }
 
-    @Override
-    public Carteira depositar(String documento,String senha,EnumMoeda moedaOrigem,BigDecimal valorMoedaOrigem, EnumMoeda moedaDestino) {
-        Carteira carteira = buscarCarteiraOuLancarExcecao(documento, senha);
-        BigDecimal valorConvertido = simularConversao(moedaOrigem, valorMoedaOrigem, moedaDestino);
-        carteira.depositar(moedaDestino, valorConvertido);
-        return repositoryPort.salvar(carteira);
-    }
+
 
     @Override
     public ConsultarSaldoTotalResponse consultarSaldoTotal(String documento, String senha) {

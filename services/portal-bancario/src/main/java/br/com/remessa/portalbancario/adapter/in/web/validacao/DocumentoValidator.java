@@ -13,4 +13,11 @@ public class DocumentoValidator implements ConstraintValidator<DocumentoValido, 
 
         return DocumentoUtils.isDocumentoValido(documento);
     }
+
+    public boolean documentoValido(String documento) {
+        if (documento == null || documento.isBlank()) {
+            return false;
+        }
+        return DocumentoUtils.isDocumentoValido(documento);
+    }
 }

@@ -2,10 +2,7 @@ package br.com.remessa.portalbancario.adapter.in.web;
 
 import br.com.remessa.portalbancario.adapter.in.web.request.ConsultarSaldoRequest;
 import br.com.remessa.portalbancario.adapter.in.web.request.ConsultarSaldoTotalRequest;
-import br.com.remessa.portalbancario.adapter.in.web.request.DepositoRequest;
 import br.com.remessa.portalbancario.adapter.in.web.response.ConsultarSaldoTotalResponse;
-import br.com.remessa.portalbancario.domain.model.Carteira;
-import br.com.remessa.portalbancario.domain.model.EnumMoeda;
 import br.com.remessa.portalbancario.domain.ports.in.CarteiraUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -39,15 +36,5 @@ public class CarteiraController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/deposito")
-    public ResponseEntity<Carteira> depositar(@Valid @RequestBody DepositoRequest request) {
-        Carteira carteira = carteiraUseCase.depositar(
-                request.getDocumento(),
-                request.getSenha(),
-                request.getMoedaOrigem(),
-                request.getValorMoedaOrigem(),
-                request.getMoedaDestino()
-        );
-        return ResponseEntity.ok(carteira);
-    }
+
 }
